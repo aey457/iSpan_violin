@@ -79,7 +79,7 @@ $row=$result->fetch_assoc();
                             <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                                 <nav class="sb-sidenav-menu-nested nav">
                                     <a class="nav-link" href="course_list.php">課程列表</a>
-                                    <a class="nav-link" href="course_management.php">課程管理</a>
+                                    <a class="nav-link" href="course_management.php">已下架課程列表</a>
                                 </nav>
                             </div>
                             <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
@@ -134,27 +134,7 @@ $row=$result->fetch_assoc();
                 <main>
                     <div class="container-fluid px-4">
                         <h1 class="mt-4">課程簡介</h1>
-                        <div class="d-flex justify-content-between mt-3 mb-3">
-                                <ul class="nav nav-pills">
-                                    <li class="nav-item">
-                                        <a class="nav-link active " aria-current="page" href="course_list.php">全部課程</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="#">初階個別課</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="#">中階個別課</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="#">高階個別課</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="#">團體課</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="#">大師班</a>
-                                    </li>
-                                </ul>
+                        <div class="d-flex justify-content-end mt-3 mb-3">
                                 <div>
                                     <a class="btn btn-dark mx-2" data-bs-toggle="modal" data-bs-target="#exampleModal" >下架課程</a> 
                                     <a class="btn btn-dark" href="course-edit.php?id=<?=$row["course_id"]?>">編輯課程</a>
@@ -179,8 +159,8 @@ $row=$result->fetch_assoc();
                             </div>
                             <!-- 可能要新增課程的簡介 編輯那邊要改成簡介  -->
                             <ol class="breadcrumb mb-4">
-                                <li class="breadcrumb-item"><a href="index.php">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="course_list.php">課程列表</a></li>
+                                <li class="breadcrumb-item"><a class="text-decoration-none text-dark" href="index.php">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a class="text-decoration-none text-dark" href="course_list.php">課程列表</a></li>
                                 <li class="breadcrumb-item active">課程簡介</li>
                             </ol>
                             
@@ -200,11 +180,14 @@ $row=$result->fetch_assoc();
                                             </div>
                                         </div>
                                         <h1><?=$row["name"]?></h1>
-                                        <div class="text-danger text-end h4">$<?=number_format($row["price"])?></div>
+                                        <div class="text-secondary text-start h4">指導教師：<?=$row["course_teacher_name"]?></div>
+                                        <div class="text-danger text-end h4">新台幣$<?=number_format($row["price"])?>元</div>
                                         <div style="font-size: 1.5rem"><?=$row["description"]?></div>
+                                        <div>限額：<?=$row["quota"]?></div>
                                         <div>課程開始：<?=$row["start_date"]?></div>
                                         <div>課程結束：<?=$row["end_date"]?></div>
-                                        <div>課程時間：<?=$row["time"]?></div>
+                                        <div>課程開始：<?=$row["start_time"]?></div>
+                                        <div>課程結束：<?=$row["end_time"]?></div>
                                         <div><?=$row["comment"]?></div>
                                     </div>
                                 </div>

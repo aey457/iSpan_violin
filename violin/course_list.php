@@ -2,35 +2,102 @@
 session_start();
 require_once("./db_violin_connect.php");
 
-// $perPage=4; //定義變數 
-
-// $sqlAll="SELECT * FROM course WHERE valid=1";
-// $resultAll = $conn->query($sqlAll); 
-// $userTotalCount = $resultAll->num_rows; //新：看多少筆數量來算需多少頁 本來：不是在搜尋的情況下應顯示總共有多少人 搜尋後頁面也顯示共多少人
-
-// $pageCount= ceil($userTotalCount / $perPage); //多一筆要多一頁 相除後是小數點就無條件進位 JS:ceil()
-// // echo $pageCount;
 
 $sql_course_category = "SELECT * FROM course_category ";
 $result_course_category = $conn->query($sql_course_category);
 $course_categories = $result_course_category->fetch_all();
 
-// $sql = "SELECT course.*, course_category.level AS course_category_level, teacher.name AS course_teacher_name, course_style.style_name AS course_style_name FROM course
-//         JOIN course_category ON course.course_category_id = course_category.course_category_id 
-//         JOIN teacher ON course.teacher_id = teacher.teacher_id 
-//         JOIN course_style ON course.style_id = course_style.style_id
-//         ORDER BY course.course_id";
 
-$sql = "SELECT course.*, course_category.level AS course_category_level, teacher.name AS course_teacher_name FROM course 
+
+$sql = "SELECT course.*, course_category.level AS course_category_level, 
+        teacher.name AS course_teacher_name, course_style.style_name AS course_style_id
+        FROM course
         JOIN course_category ON course.course_category_id = course_category.course_category_id 
         JOIN teacher ON course.teacher_id = teacher.teacher_id 
-        WHERE course.valid = 1
+        JOIN course_style ON course.style_id = course_style.style_id
+        AND valid=1
         ORDER BY course.course_id";
 
+// 如果有指定 category_id，修改 SQL 查詢以僅檢索特定類別的課程
+    $category_id = null;
+if (isset($_GET["category_id"])) {
+    $category_id = $_GET["category_id"];
+    
+    $sql = "SELECT course.*, course_category.level AS course_category_level, 
+            teacher.name AS course_teacher_name, course_style.style_name AS course_style_id
+            FROM course
+            JOIN course_category ON course.course_category_id = course_category.course_category_id 
+            JOIN teacher ON course.teacher_id = teacher.teacher_id 
+            JOIN course_style ON course.style_id = $course_style.style_id
+            WHERE course.course_category_id = $category_id AND course.valid=1
+            ORDER BY course.course_id";
+}
+// var_dump($category_id);
 $result=$conn->query($sql);
 $rowCount=$result->num_rows;
 $rows=$result->fetch_all(MYSQLI_ASSOC);
 // var_dump($rows);
+
+$perPage = 15;
+
+// 如果有搜尋字詞
+if (isset($_GET["search"])) {
+    $search = $_GET["search"];
+    $sqlsearch = "SELECT course.*, course_category.level AS course_category_level, 
+            teacher.name AS course_teacher_name, course_style.style_name AS course_style_id
+            FROM course
+            JOIN course_category ON course.course_category_id = course_category.course_category_id 
+            JOIN teacher ON course.teacher_id = teacher.teacher_id 
+            JOIN course_style ON course.style_id = course_style.style_id
+            WHERE course.name LIKE '%$search%' AND course.valid=1
+            ORDER BY course.course_id";
+
+    $searchResult = $conn->query($sqlsearch);
+
+    if ($searchResult) {
+        // 處理查詢結果
+        while ($searchValues = $searchResult->fetch_assoc()) {
+            // 處理每一筆資料
+            // var_dump($searchValues); 用來檢查抓到什麼資料
+        }
+
+        // 計算搜尋結果的總行數和分頁數目
+        $courseTotalCount = $searchResult->num_rows;
+        $pageCount = ceil($courseTotalCount / $perPage);
+        echo $pageCount;
+    } else {
+        echo "SQL 錯誤: " . $conn->error;
+    }
+} else {
+    // 如果沒有搜尋字詞，則顯示分頁後的所有資料
+    if (isset($_GET["p"])) {
+        $p = $_GET["p"];
+        $startIndex = ($p - 1) * $perPage;
+
+        // SQL 查詢課程資料，並加上 JOIN 的部分
+        $sqlAll = "SELECT course.*, course_category.level AS course_category_level, 
+                teacher.name AS course_teacher_name, course_style.style_name AS course_style_id
+                FROM course
+                JOIN course_category ON course.course_category_id = course_category.course_category_id 
+                JOIN teacher ON course.teacher_id = teacher.teacher_id 
+                JOIN course_style ON course.style_id = $course_style.style_id
+                WHERE course.valid=1
+                ORDER BY course.course_id
+                LIMIT $startIndex, $perPage";
+
+        $resultAll = $conn->query($sqlAll);
+        $courseTotalCount = $resultAll->num_rows;
+        $pageCount = ceil($courseTotalCount / $perPage);
+        echo $pageCount;
+
+        // 處理查詢結果
+        while ($searchValues = $resultAll->fetch_assoc()) {
+            // 處理每一筆資料
+            // var_dump($searchValues); 用來檢查抓到什麼資料
+        }
+    }
+}
+
 
 
 ?>
@@ -45,6 +112,7 @@ $rows=$result->fetch_all(MYSQLI_ASSOC);
         <meta name="author" content="" />
         <title>Static Navigation - SB Admin</title>
         <link href="css/styles.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
     </head>
     <body>
@@ -92,7 +160,7 @@ $rows=$result->fetch_all(MYSQLI_ASSOC);
                             <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                                 <nav class="sb-sidenav-menu-nested nav">
                                     <a class="nav-link" href="course_list.php">課程列表</a>
-                                    <a class="nav-link" href="course_management.php">課程管理</a>
+                                    <a class="nav-link" href="course_management.php">已下架課程列表</a>
                                 </nav>
                             </div>
                             <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
@@ -149,56 +217,40 @@ $rows=$result->fetch_all(MYSQLI_ASSOC);
                     <div class="container-fluid px-4">
                         <h1 class="mt-4">課程列表</h1>
                         <ol class="breadcrumb mb-4">
-                            <li class="breadcrumb-item"><a href="index.php">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a class="text-decoration-none text-dark" href="index.php">Dashboard</a></li>
                             <li class="breadcrumb-item active">課程列表</li>
                         </ol>
                         <div class="d-flex justify-content-between mb-3">
-                            <ul class="nav nav-pills">
-                                <?php foreach ($course_categories as $category): ?>
+                        <ul class="nav nav-pills">
+                            <?php foreach ($course_categories as $category): ?>
                                 <li class="nav-item">
-                                    <a class="nav-link active mx-2 bg-dark" aria-current="page" href="#"><?= $category[1]?></a>
+                                    <a class="nav-link mx-2 bg-dark text-white" href="course-list.php?category_id=<?= $category[0] ?>"><?= $category[1]?></a>
                                 </li>
-                                
-                                <?php endforeach; ?>
-                            </ul>
+                            <?php endforeach; ?>
+                        </ul>
                             <a class="btn btn-dark" href="course-upload.php">新增課程</a>
                         </div>
                         <div class="py-2">
                         <form action="">
                             <div class="row g-3 align-items-center">
-                                <!-- 增加一個回去的按鈕 -->
-                                <?php if(isset($_GET["min"]) && isset($_GET["max"])):?>
-                                    <div class="col-auto">
-                                    <a href="#"
-                                    name=""
-                                    id=""
-                                    class="btn btn-primary"
-                                    role="button"><i class="fa-solid fa-arrow-left"></i>
-                                    </a>
+                                <form action="" method="get">
+                                    <div class="container mt-2 mb-1">
+                                        <div class="row d-flex justify-content-end">
+                                            <div class="col-md-4"> 
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" placeholder="課程搜尋" aria-label="Recipient's username" aria-describedby="button-addon2" name="search"
+                                                        <?php
+                                                        if (isset($_GET["search"])) :
+                                                            $searchValue = $_GET["search"];
+                                                        ?> value="<?= $searchValue ?>" <?php endif; ?>>
+                                                    <button class="btn btn-outline-secondary" type="submit" id="button-addon2"><i class="fa-solid fa-magnifying-glass"></i></button>
+                                                </div>      
+                                            </div>
+                                        </div>
                                     </div>
-                                <?php endif; ?> 
-                                <!-- 為何按回去是not found? -->
-                                <div class="col-auto">
-                                    <?php $minvalue=0;  //當最小值為0的時候
-                                    if(isset($_GET["min"])){
-                                        $minValue=$min;
-                                    }
-                                    ?>
-                                    <input type="number" class="form-control" name="min" value="<?=$minValue?>" min="0">
-                                </div>
-                                <div class="col-auto">
-                                    ~
-                                </div>
-                                <div class="col-auto">
-                                    <input type="number" class="form-control" name="max" value="<?=$maxValue?>" min="0">
-                                </div>
-                                <div class="col-auto">
-                                    <button class="btn btn-dark" type="submit">搜尋</button>
-                                </div>
+                                </form>
                             </div>
                         </form>
-                        
-                        
                             <div class="card mt-3 mb-4">
                             <div class="card-header">
                                 <i class="fas fa-table me-1"></i>
@@ -208,12 +260,15 @@ $rows=$result->fetch_all(MYSQLI_ASSOC);
                                 <table class="table" id="datatablesSimple">
                                     <thead>
                                         <tr>
+                                            <th>課程圖片</th>
                                             <th>課程名稱</th>
+                                            <th>課程風格</th>
                                             <th>課程種類</th>
                                             <th>指導教師</th>
                                             <th>費用</th>
                                             <th>限額</th>
-                                            <th>課程時間</th>
+                                            <th>開始時間</th>
+                                            <th>結束時間</th>
                                             <th>開始日期</th>
                                             <th>結束日期</th>
                                             <th>編輯</th>
@@ -221,39 +276,66 @@ $rows=$result->fetch_all(MYSQLI_ASSOC);
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    <?php foreach ($rows as $course_list): ?>
+                                    <?php 
+                                        // 如果有搜尋結果，顯示搜尋結果；否則顯示所有課程
+                                        $displayRows = isset($searchResult) ? $searchResult : $rows;
+                                        
+                                        foreach ($displayRows as $course_list): 
+                                    ?>
                                         <tr>
-                                            
-                                            <td><a class="text-decoration-none" href="course.php?id=<?=$course_list["course_id"]?>"><?=$course_list["name"]?></a></td>
+                                            <td><img style="max-width:100px; max-height: 100px;"  src="./course_images/<?=$course_list["img"]?>" alt="課程圖片"></td>
+                                            <td><a class=" text-decoration-none text-dark fw-bold fs-5" href="course.php?id=<?=$course_list["course_id"]?>"><?=$course_list["name"]?></a></td>
+                                            <td><?=$course_list["course_style_id"]?></td>
                                             <td><?=$course_list["course_category_level"]?></td>
                                             <td><?=$course_list["course_teacher_name"]?></td>
-                                            <td><?=$course_list["price"]?></td>
+                                            <td>新台幣<?= number_format($course_list["price"])?>元</td>
                                             <td><?=$course_list["quota"]?></td>
-                                            <td><?=$course_list["time"]?></td>
+                                            <td><?=$course_list["start_time"]?></td>
+                                            <td><?=$course_list["end_time"]?></td>
                                             <td><?=$course_list["start_date"]?></td>
                                             <td><?=$course_list["end_date"]?></td>
-                                            <td><a class="text-decoration-none" href="course-edit.php?id=<?=$course_list["course_id"]?>">編輯圖標</a></td>
-                                            <td><a class="text-decoration-none" href="DoDeleteCourse.php?id=<?=$course_list["course_id"]?>">下架圖標</a></td>
-                                            
+                                            <td><a class="text-decoration-none text-dark" href="course-edit.php?id=<?=$course_list["course_id"]?>"><i class="fa-regular fa-pen-to-square"></i></a></td>
+                                            <td><a class="text-decoration-none text-dark" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa-regular fa-square-caret-down"></i></a></td>
                                         </tr>
-                                        </tbody>
                                     <?php endforeach; ?> 
+                                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="exampleModalLabel">注意：下架課程</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        您確定要下架此筆課程資料嗎？
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-dark" data-bs-dismiss="modal">取消</button>
+                                        <a class="btn btn-danger" href="DoDeleteCourse.php?id=<?=$course_list["course_id"]?>">確定下架</a>
+                                    </div>
+                                    </div>
+                                </div>
+                    </div>
                                     </tbody>
                                 </table>
-                            </div>
-                        
-                        
-                        
-                        
-                        
+                            </div>      
                         </div>
-                        <nav aria-label="Page navigation example">
-                        <ul class="pagination">
-                            <li class="page-item"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        </ul>
-                        </nav>
+                        <div class="py-2 text-center">
+                            共<?=$rowCount?>筆課程
+                        </div>
+                        <!-- <?php if (!isset($_GET["search"])) : ?>
+                            <nav aria-label="Page navigation example">
+                                <ul class="pagination">
+                                    <?php for ($i = 1; $i <= $pageCount; $i++) : ?>
+                                        <li class="page-item 
+                                        <?php
+                                        if ($i == $p) echo "active";
+                                        ?>"><a class="page-link" href="course-list.php?order=<?=$order?>&p=<?= $i ?>"><?= $i ?></a></li>
+                                    <?php endfor; ?>
+                                </ul>
+                            </nav>
+                        <?php endif; ?> -->
+
+                
                     </div>
                         <div style="height: 100vh"></div>
                         <div class="card mb-4"><div class="card-body">When scrolling, the navigation stays at the top of the page. This is the end of the static navigation demo.</div></div>
