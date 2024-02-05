@@ -9,7 +9,7 @@ $sql = "SELECT course.*, course_category.level AS course_category_level,
         JOIN course_category ON course.course_category_id = course_category.course_category_id 
         JOIN teacher ON course.teacher_id = teacher.teacher_id 
         JOIN course_style ON course.style_id = course_style.style_id
-        WHERE course.course_id = $id AND valid=1
+        WHERE course.course_id = $id
         ORDER BY course.course_id";
 
 $result=$conn->query($sql);
@@ -184,6 +184,15 @@ $row=$result->fetch_assoc();
                                         <div class="text-danger text-end h4">新台幣$<?=number_format($row["price"])?>元</div>
                                         <div style="font-size: 1.5rem"><?=$row["description"]?></div>
                                         <div>限額：<?=$row["quota"]?></div>
+                                        <div>狀態：
+                                            <?php
+                                            if ($row["valid"] == 1) {
+                                                echo '<span style="color: red;">上架</span>';
+                                            } else {
+                                                echo '<span style="color: red;">下架</span>';
+                                            }
+                                            ?>
+                                        </div>
                                         <div>課程開始：<?=$row["start_date"]?></div>
                                         <div>課程結束：<?=$row["end_date"]?></div>
                                         <div>課程開始：<?=$row["start_time"]?></div>

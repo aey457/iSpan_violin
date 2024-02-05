@@ -8,7 +8,7 @@ if(!isset($_GET["id"])){
 }
 // var_dump($id);
 
-$sql="SELECT * FROM course WHERE course_id = $id AND valid=1";//把GET存到id裡去
+$sql="SELECT * FROM course WHERE course_id = $id";//把GET存到id裡去
 $result=$conn->query($sql);
 $row = $result->fetch_assoc();
 
@@ -247,11 +247,16 @@ $styles = $result_style->fetch_all();
                                 <label for="" class="form-label">限額</label>
                                 <input type="text" class="form-control" name="quota" value="<?= $row["quota"]?>">
                             </div>
-                            <p class="fs-5 mt-3">個別課不需選擇課程日期、時間，自行與教師商議</ㄣ>
+                            <div class="inputgroup my-3 d-flex jutify-center-start">
+                                <div>上下架選擇：</div>
+                                <input class="mx-2" type="radio" name="valid" value="1" <?php echo ($row["valid"] == 1) ? "checked" : ""; ?>> 上架
+                                </div>
+                            </div>
+                            <p class="fs-5 mt-3">個別課不需選擇課程日期、時間，自行與教師商議</p>
                             <p>課程開始日期 <input class="mt-3 mx-2" type="text" id="start-datepicker" name="start_date" value="<?= $row["start_date"]?>"></p>
                             <p>課程結束日期 <input class="mt-1 mx-2" type="text" id="end-datepicker" name="end_date" value="<?= $row["end_date"]?>"></p>
-                            <p>上課開始時間 <input type="text" id="start-timePicker" name="start_time" placeholder="選擇時間" value="<?= $row["start_time"]?>"></p>
-                            <p>上課結束時間 <input type="text" id="end-timePicker" name="end_time" placeholder="選擇結束時間" value="<?= $row["end_time"]?>"></p>
+                            <p>上課開始時間 <input class="mx-2" type="text" id="start-timePicker" name="start_time" placeholder="選擇時間" value="<?= $row["start_time"]?>"></p>
+                            <p>上課結束時間 <input class="mx-2" type="text" id="end-timePicker" name="end_time" placeholder="選擇結束時間" value="<?= $row["end_time"]?>"></p>
                             <div class="mb-3">
                                 <label for="courseAddIntro" class="form-label mt-3">描述</label>
                                 <textarea class="form-control" id="courseAddIntro" rows="3" name="des"><?= $row["description"]?></textarea>
@@ -293,7 +298,7 @@ $styles = $result_style->fetch_all();
          }
      });
      </script> -->
-    // 選擇新圖片時的預覽函數
+
     <script>
     function previewImage() {
         var input = document.getElementById('imageInput');

@@ -211,7 +211,7 @@ $styles = $result_style->fetch_all();
                                     <a class="btn btn-dark" href="course_list.php" role="button"><i class="fa-solid fa-chevron-left"></i>回課程列表</a>
                                 </div>
                                 <div class="mb-2">
-                                    <label for="" class="form-label">課程名稱</label>
+                                    <label for="" class="form-label">課程名稱（必填）</label>
                                     <input type="text" class="form-control" name="name">
                                 </div>
                                 <div class="mb-2">
@@ -220,32 +220,33 @@ $styles = $result_style->fetch_all();
                                     <div id="imagePreview"></div>
                                 </div> 
                                 <select class="form-select mt-3" id="course_category_level" name="course_category_level" aria-label="Default select example">
-                                    <option selected disabled hidden >課程類别</option>
+                                    <option selected disabled hidden >課程類别（必選）</option>
                                     <?php foreach ($course_categories as $category) : ?>
                                         <option value="<?= $category[0] ?>"><?= $category[1] ?></option>
                                     <?php endforeach; ?>
                                 </select>
 
                                 <select class="form-select mt-3" name="course_teacher_name" aria-label="Default select example">
-                                    <option selected disabled hidden >授課老師</option>
+                                    <option selected disabled hidden >授課老師（必選）</option>
                                     <?php foreach ($teachers as $teacher) : ?>
                                         <option value="<?= $teacher[0] ?>"><?= $teacher[1] ?></option>
                                     <?php endforeach; ?>
                                 </select>
                                 <select class="form-select mt-3" name="style" aria-label="Default select example">
-                                    <option selected disabled hidden name="style">課程音樂風格</option>
+                                    <option selected disabled hidden name="style">課程音樂風格（必選）</option>
                                     <?php foreach ($styles as $style) : ?>
                                         <option value="<?= $style[0] ?>"><?= $style[1] ?></option>
                                     <?php endforeach; ?>
                                 </select>
                                 <div class="mb-2 mt-3">
-                                    <label for="" class="form-label">學費</label>
+                                    <label for="" class="form-label">學費（必填）</label>
                                     <input type="text" class="form-control" name="price">
                                 </div>
                                 <div class="mb-2">
-                                    <label for="" class="form-label">限額</label>
+                                    <label for="" class="form-label">限額（必填）</label>
                                     <input type="text" class="form-control" name="quota">
                                 </div>
+                                <p class="fs-5 mt-3">個別課不需選擇課程日期、時間，自行與教師商議</p>
                                 <p id="startDateSection">
                                     課程開始日期 <input class="mt-3 mx-2" type="text" id="start-datepicker" name="start_date">
                                 </p>
@@ -253,10 +254,10 @@ $styles = $result_style->fetch_all();
                                     課程結束日期 <input class="mt-1 mx-2" type="text" id="end-datepicker" name="end_date">
                                 </p>
                                 <p id="startTimeSection">
-                                    上課開始時間 <input type="text" id="start-timePicker" name="start_time" placeholder="選擇時間">
+                                    上課開始時間 <input class="mx-2" type="text" id="start-timePicker" name="start_time" placeholder="選擇時間">
                                 </p>
                                 <p id="endTimeSection">
-                                    上課結束時間 <input type="text" id="end-timePicker" name="end_time" placeholder="選擇結束時間">
+                                    上課結束時間 <input class="mx-2" type="text" id="end-timePicker" name="end_time" placeholder="選擇結束時間">
                                 </p> 
                                 <!-- <p>
                                     課程開始日期 <input class="mt-3 mx-2" type="text" id="start-datepicker" name="start_date">

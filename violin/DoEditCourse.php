@@ -11,6 +11,7 @@ $course_category = $_POST["course_category_level"];
 $teacher = $_POST["course_teacher_name"];
 $style = $_POST["style"];
 $comment = $_POST["comment"];
+$valid = $_POST["valid"];
 
 $des = $_POST["des"];
 $quota = $_POST["quota"];
@@ -41,7 +42,7 @@ if ($_FILES["course_images"]["error"] == 0) {
 // $sql = "UPDATE course SET name='$name', course_category_id='$course_category', teacher_id='$teacher', quota='$quota', price='$price', style_id='$style', description='$des', comment='$comment', start_date='$start_date', end_date='$end_date', start_time='$start_time', end_time='$end_time', valid=1, img='$filename' WHERE course_id=$id";
 
 // 建立更新的 SQL
-$sql = "UPDATE course SET name='$name', course_category_id='$course_category', teacher_id='$teacher', quota='$quota', price='$price', style_id='$style', description='$des', comment='$comment', start_date='$start_date', end_date='$end_date', start_time='$start_time', end_time='$end_time', valid=1";
+$sql = "UPDATE course SET name='$name', course_category_id='$course_category', teacher_id='$teacher', quota='$quota', price='$price', style_id='$style', description='$des', comment='$comment', start_date='$start_date', end_date='$end_date', start_time='$start_time', end_time='$end_time', valid='$valid'";
 
 // 如果有新的圖片，加上更新圖片的部分
 if ($_FILES["course_images"]["error"] == 0) {
